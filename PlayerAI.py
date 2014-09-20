@@ -13,10 +13,8 @@ class PlayerAI():
         my_x = my_position[0]
         my_y = my_position[1]
         my_direction = player_lightcycle['direction']
-        #randMove = random.randint(0, 3)
-        my_direction = 2
         randMove = self.next_move(my_x, my_y, game_map, my_direction)
-        if randMove == 0:
+        if randMove == 3:
             return PlayerActions.MOVE_LEFT
         elif randMove == 1:
             return PlayerActions.MOVE_RIGHT
@@ -26,6 +24,8 @@ class PlayerAI():
             return PlayerActions.MOVE_UP
 
     def next_move(self, x, y, game_map, direction):
+        #checks current direction
+        print direction
         if direction == 2:
             down = self.check_down(x, y, game_map)
             if down:
@@ -35,7 +35,7 @@ class PlayerAI():
         elif direction == 3:
             left = self.check_left(x, y, game_map)
             if left:
-                return 0
+                return 3
             else:
                 return self.find_next_step(x, y, game_map, direction)
         elif direction == 1:
@@ -47,73 +47,113 @@ class PlayerAI():
         else:
             up = self.check_up(x,y,game_map)
             if up:
-                return 3
+                return 0
             else:
                 return self.find_next_step(x, y, game_map, direction)
 
     def find_next_step(self, x, y, game_board, direction):
-        if direction is not 3:
+        if direction is 3:
             down = self.check_down(x,y, game_board)
             up = self.check_up(x, y, game_board)
-            if down:
-                return 2
-            elif up:
-                return 3
+            print self.go_up(y, game_board)
+            if self.go_up(y, game_board):
+                if up:
+                    return 0
+                else:
+                    return 2
             else:
-                return 1
+                if down:
+                    return 2
+                else:
+                    return 0
 
-        elif direction is not 1:
+        elif direction is 1:
+            print "going right"
             down = self.check_down(x,y, game_board)
             up = self.check_up(x, y, game_board)
-            if down:
-                return 2
-            elif up:
-                return 3
+            if self.go_up(y, game_board):
+                if up:
+                    return 0
+                else:
+                    return 2
             else:
-                return 0
+                if down:
+                    return 2
+                else:
+                    return 0
 
-        elif direction is not 0:
-            right = self.check_right(x,y, game_board)
+        elif direction is 2:
+            right = self.check_right(x, y, game_board)
             left = self.check_left(x, y, game_board)
-            if right:
-                return 1
-
-            elif left:
-                return 0
+            if self.go_left(x, game_board):
+                if left:
+                    return 3
+                else:
+                    return 1
             else:
-                return 2
+                if right:
+                    return 1
+                else:
+                    return 3
+
         else:
             right = self.check_right(x,y, game_board)
             left = self.check_left(x, y, game_board)
-            if right:
-                return 1
-            elif left:
-                return 0
+            if self.go_left(x, game_board):
+                if left:
+                    return 3
+                else:
+                    return 1
             else:
-                return 3
+                if right:
+                    return 1
+                else:
+                    return 3
 
+
+    def go_up(self, y, game_board):
+        result = y*(1.0)/(len(game_board[0]) - 1)
+        print result
+        if result > 0.5:
+            return True
+        else:
+            return False
+
+    def go_left(self, x, game_board):
+        result = (x*1.0)/(len(game_board[0]) - 1)
+        if result > 0.5:
+            return True
+        else:
+            return False
 
     def check_left(self, x, y, game_board):
-        if game_board[x-1][y] != "empty":
+        if x <= 0:
+            return False
+        elif game_board[x-1][y] != "empty":
             return False
         else:
             return True
 
     def check_right(self, x, y, game_board):
-        if game_board[x+1][y] != "empty":
+        if x >= (len(game_board) - 1):
+            return False
+        elif game_board[x+1][y] != "empty":
             return False
         else:
             return True
 
     def check_down(self, x, y, game_board):
-        print game_board[x][y+1]
-        if game_board[x][y+1] != "empty":
+        if y>=(len(game_board[0])-1):
+            return False
+        elif game_board[x][y+1] != "empty":
             return False
         else:
             return True
 
     def check_up(self, x, y, game_board):
-        if game_board[x][y-1] != "empty":
+        if y <= 0:
+            return False
+        elif game_board[x][y-1] != "empty":
             return False
         else:
             return True
