@@ -1,5 +1,6 @@
 import random
 from tronclient.Client import *
+from Enums import PlayerActions
 
 class PlayerAI():
     def __init__(self):
@@ -28,87 +29,68 @@ class PlayerAI():
         print direction
         if direction == 2:
             down = self.check_down(x, y, game_map)
-            if down:
+            if down and self.peek(x, y, game_map, 2):
                 return 2
             else:
                 return self.find_next_step(x, y, game_map, direction)
         elif direction == 3:
             left = self.check_left(x, y, game_map)
-            if left:
+            if left and self.peek(x, y, game_map, 3):
                 return 3
             else:
                 return self.find_next_step(x, y, game_map, direction)
         elif direction == 1:
             right = self.check_right(x, y, game_map)
-            if right:
+            if right and self.peek(x, y, game_map, 1):
                 return 1
             else:
                 return self.find_next_step(x, y, game_map, direction)
         else:
-            up = self.check_up(x,y,game_map)
-            if up:
-                return 0
+            up = self.check_up(x, y, game_map)
+            if up and self.peek(x, y, game_map, 0):
+                return
             else:
                 return self.find_next_step(x, y, game_map, direction)
 
     def find_next_step(self, x, y, game_board, direction):
-        if direction is 3:
-            down = self.check_down(x,y, game_board)
-            up = self.check_up(x, y, game_board)
-            print self.go_up(y, game_board)
-            if self.go_up(y, game_board):
-                if up:
+        down = self.check_down(x,y, game_board)
+        peek_down = self.peek(x, y, game_board, 2)
+        up = self.check_up(x, y, game_board)
+        peek_up = self.peek(x, y, game_board, 0)
+        right = self.check_right(x, y, game_board)
+        peek_right = self.peek(x, y, game_board, 1)
+        left = self.check_left(x, y, game_board)
+        peek_left = self.peek(x, y, game_board, 3)
+        if direction is 3 or direction is 1:
+            if not peek_down and peek_up:
                     return 0
-                else:
+            elif not peek_up and peek_down:
+                    return 2
+            elif not down and up:
+                    return 0
+            elif not up and down:
                     return 2
             else:
-                if down:
-                    return 2
-                else:
-                    return 0
-
-        elif direction is 1:
-            print "going right"
-            down = self.check_down(x,y, game_board)
-            up = self.check_up(x, y, game_board)
-            if self.go_up(y, game_board):
-                if up:
+                if self.go_up(y, game_board):
                     return 0
                 else:
                     return 2
-            else:
-                if down:
-                    return 2
-                else:
-                    return 0
-
-        elif direction is 2:
-            right = self.check_right(x, y, game_board)
-            left = self.check_left(x, y, game_board)
-            if self.go_left(x, game_board):
-                if left:
-                    return 3
-                else:
-                    return 1
-            else:
-                if right:
-                    return 1
-                else:
-                    return 3
 
         else:
-            right = self.check_right(x,y, game_board)
-            left = self.check_left(x, y, game_board)
-            if self.go_left(x, game_board):
-                if left:
+            if not peek_right and peek_left:
                     return 3
-                else:
+            elif not peek_left and peek_right:
+                    return 1
+            elif not right and left:
+                    return 3
+            elif not left and right:
                     return 1
             else:
-                if right:
-                    return 1
-                else:
+                if self.go_left(x, game_board):
                     return 3
+                else:
+                    return 1
+
 
 
     def go_up(self, y, game_board):
@@ -129,7 +111,7 @@ class PlayerAI():
     def check_left(self, x, y, game_board):
         if x <= 0:
             return False
-        elif game_board[x-1][y] != "empty":
+        elif game_board[x-1][y] != EMPTY and game_board[x-1][y] != POWERUP:
             return False
         else:
             return True
@@ -137,7 +119,7 @@ class PlayerAI():
     def check_right(self, x, y, game_board):
         if x >= (len(game_board) - 1):
             return False
-        elif game_board[x+1][y] != "empty":
+        elif game_board[x+1][y] != EMPTY and game_board[x+1][y] != POWERUP:
             return False
         else:
             return True
@@ -145,7 +127,7 @@ class PlayerAI():
     def check_down(self, x, y, game_board):
         if y>=(len(game_board[0])-1):
             return False
-        elif game_board[x][y+1] != "empty":
+        elif game_board[x][y+1] != EMPTY and game_board[x][y+1] != POWERUP:
             return False
         else:
             return True
@@ -153,12 +135,20 @@ class PlayerAI():
     def check_up(self, x, y, game_board):
         if y <= 0:
             return False
-        elif game_board[x][y-1] != "empty":
+        elif game_board[x][y-1] != EMPTY and game_board[x][y-1] != POWERUP:
             return False
         else:
             return True
 
-
+    def peek(self, x, y, game_board, direction):
+        if direction  == 0:
+            return self.check_up(x, y-1, game_board)
+        elif direction == 1:
+            return self.check_right(x+1, y, game_board)
+        elif direction == 2:
+            return self.check_down(x, y+1, game_board)
+        else:
+            return self.check_left(x-1, y, game_board)
 
 
 '''
