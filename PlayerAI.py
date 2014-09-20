@@ -26,47 +26,38 @@ class PlayerAI():
 
     def next_move(self, x, y, game_map, direction):
         #checks current direction
-        print direction
         if direction == 2:
             down = self.check_down(x, y, game_map)
-            if down and self.peek(x, y, game_map, 2):
+            if down and self.not_dead_end(x, y, game_map, 2):
                 return 2
             else:
-                return self.find_next_step(x, y, game_map, direction)
+                return self.find_next_step(x, y, game_map, 2)
         elif direction == 3:
             left = self.check_left(x, y, game_map)
-            if left and self.peek(x, y, game_map, 3):
+            if left and self.not_dead_end(x, y, game_map, 3):
                 return 3
             else:
-                return self.find_next_step(x, y, game_map, direction)
+                return self.find_next_step(x, y, game_map, 3)
         elif direction == 1:
             right = self.check_right(x, y, game_map)
-            if right and self.peek(x, y, game_map, 1):
+            if right and self.not_dead_end(x, y, game_map, 1):
                 return 1
             else:
-                return self.find_next_step(x, y, game_map, direction)
+                return self.find_next_step(x, y, game_map, 1)
         else:
             up = self.check_up(x, y, game_map)
-            if up and self.peek(x, y, game_map, 0):
+            if up and self.not_dead_end(x, y, game_map, 0):
                 return
             else:
-                return self.find_next_step(x, y, game_map, direction)
+                return self.find_next_step(x, y, game_map, 0)
 
     def find_next_step(self, x, y, game_board, direction):
         down = self.check_down(x,y, game_board)
-        peek_down = self.peek(x, y, game_board, 2)
         up = self.check_up(x, y, game_board)
-        peek_up = self.peek(x, y, game_board, 0)
         right = self.check_right(x, y, game_board)
-        peek_right = self.peek(x, y, game_board, 1)
         left = self.check_left(x, y, game_board)
-        peek_left = self.peek(x, y, game_board, 3)
         if direction is 3 or direction is 1:
-            if not peek_down and peek_up:
-                    return 0
-            elif not peek_up and peek_down:
-                    return 2
-            elif not down and up:
+            if not down and up:
                     return 0
             elif not up and down:
                     return 2
@@ -77,11 +68,7 @@ class PlayerAI():
                     return 2
 
         else:
-            if not peek_right and peek_left:
-                    return 3
-            elif not peek_left and peek_right:
-                    return 1
-            elif not right and left:
+            if not right and left:
                     return 3
             elif not left and right:
                     return 1
@@ -149,6 +136,17 @@ class PlayerAI():
             return self.check_down(x, y+1, game_board)
         else:
             return self.check_left(x-1, y, game_board)
+
+    def not_dead_end(self, x, y, game_board, direction):
+        if direction  == 0:
+            return self.check_up(x, y-1, game_board) or self.check_left(x, y-1, game_board) or self.check_right(x, y-1, game_board)
+        elif direction == 1:
+            return self.check_right(x+1, y, game_board) or self.check_up(x+1, y, game_board) or self.check_down(x+1, y, game_board)
+        elif direction == 2:
+            return self.check_down(x, y+1, game_board) or self.check_left(x, y+1, game_board) or self.check_right(x, y+1, game_board)
+        else:
+            return self.check_left(x-1, y, game_board) or self.check_up(x-1, y, game_board) or self.check_down(x-1, y, game_board)
+
 
 
 '''
