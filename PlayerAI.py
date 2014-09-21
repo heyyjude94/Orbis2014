@@ -27,35 +27,35 @@ class PlayerAI():
     def next_move(self, x, y, game_map, direction):
         #checks current direction
         if direction == 2:
-            down = self.check_down(x, y, game_map)
-            if down and self.not_dead_end(x, y, game_map, 2):
+            down = self.check_down(x, y, game_map, "all")
+            if down and self.not_dead_end(x, y, game_map, 2) and self.peek(x,y,game_map, 2):
                 return 2
             else:
                 return self.find_next_step(x, y, game_map, 2)
         elif direction == 3:
-            left = self.check_left(x, y, game_map)
-            if left and self.not_dead_end(x, y, game_map, 3):
+            left = self.check_left(x, y, game_map, "all")
+            if left and self.not_dead_end(x, y, game_map, 3) and self.peek(x,y,game_map, 3):
                 return 3
             else:
                 return self.find_next_step(x, y, game_map, 3)
         elif direction == 1:
-            right = self.check_right(x, y, game_map)
-            if right and self.not_dead_end(x, y, game_map, 1):
+            right = self.check_right(x, y, game_map, "all")
+            if right and self.not_dead_end(x, y, game_map, 1) and self.peek(x,y,game_map, 1):
                 return 1
             else:
                 return self.find_next_step(x, y, game_map, 1)
         else:
-            up = self.check_up(x, y, game_map)
-            if up and self.not_dead_end(x, y, game_map, 0):
+            up = self.check_up(x, y, game_map, "all")
+            if up and self.not_dead_end(x, y, game_map, 0) and self.peek(x,y,game_map, 0):
                 return
             else:
                 return self.find_next_step(x, y, game_map, 0)
 
     def find_next_step(self, x, y, game_board, direction):
-        down = self.check_down(x,y, game_board)
-        up = self.check_up(x, y, game_board)
-        right = self.check_right(x, y, game_board)
-        left = self.check_left(x, y, game_board)
+        down = self.check_down(x,y, game_board, "all")
+        up = self.check_up(x, y, game_board, "all")
+        right = self.check_right(x, y, game_board, "all")
+        left = self.check_left(x, y, game_board, "all")
         if direction is 3 or direction is 1:
             if not down and up:
                     return 0
@@ -82,7 +82,6 @@ class PlayerAI():
 
     def go_up(self, y, game_board):
         result = y*(1.0)/(len(game_board[0]) - 1)
-        print result
         if result > 0.5:
             return True
         else:
@@ -95,57 +94,85 @@ class PlayerAI():
         else:
             return False
 
-    def check_left(self, x, y, game_board):
+    def check_left(self, x, y, game_board, check_type):
         if x <= 0:
             return False
-        elif game_board[x-1][y] != EMPTY and game_board[x-1][y] != POWERUP:
-            return False
+        elif check_type == "opponent":
+            if game_board[x-1][y] == LIGHTCYCLE:
+                return False
+            else:
+                return True
         else:
-            return True
+            if game_board[x-1][y] != EMPTY and game_board[x-1][y] != POWERUP:
+                return False
+            else:
+                return True
 
-    def check_right(self, x, y, game_board):
+    def check_right(self, x, y, game_board, check_type):
         if x >= (len(game_board) - 1):
             return False
-        elif game_board[x+1][y] != EMPTY and game_board[x+1][y] != POWERUP:
-            return False
-        else:
-            return True
 
-    def check_down(self, x, y, game_board):
+        elif check_type == "opponent":
+            if game_board[x+1][y] == LIGHTCYCLE:
+                return False
+            else:
+                return True
+
+        else:
+            if game_board[x+1][y] != EMPTY and game_board[x+1][y] != POWERUP:
+                return False
+            else:
+                return True
+
+    def check_down(self, x, y, game_board, check_type):
         if y>=(len(game_board[0])-1):
             return False
-        elif game_board[x][y+1] != EMPTY and game_board[x][y+1] != POWERUP:
-            return False
+        elif check_type == "opponent":
+            if game_board[x][y+1] == LIGHTCYCLE:
+                return False
+            else:
+                return True
         else:
-            return True
+            if game_board[x][y+1] != EMPTY and game_board[x][y+1] != POWERUP:
+                return False
+            else:
+                return True
 
-    def check_up(self, x, y, game_board):
+
+    def check_up(self, x, y, game_board, check_type):
         if y <= 0:
             return False
-        elif game_board[x][y-1] != EMPTY and game_board[x][y-1] != POWERUP:
-            return False
+
+        elif check_type == "opponent":
+            if game_board[x][y-1] == LIGHTCYCLE:
+                return False
+            else:
+                return True
         else:
-            return True
+            if game_board[x][y-1] != EMPTY and game_board[x][y-1] != POWERUP:
+                return False
+            else:
+                return True
 
     def peek(self, x, y, game_board, direction):
         if direction  == 0:
-            return self.check_up(x, y-1, game_board)
+            return self.check_up(x, y-1, game_board, "opponent")
         elif direction == 1:
-            return self.check_right(x+1, y, game_board)
+            return self.check_right(x+1, y, game_board, "opponent")
         elif direction == 2:
-            return self.check_down(x, y+1, game_board)
+            return self.check_down(x, y+1, game_board, "opponent")
         else:
-            return self.check_left(x-1, y, game_board)
+            return self.check_left(x-1, y, game_board, "opponent")
 
     def not_dead_end(self, x, y, game_board, direction):
         if direction  == 0:
-            return self.check_up(x, y-1, game_board) or self.check_left(x, y-1, game_board) or self.check_right(x, y-1, game_board)
+            return self.check_up(x, y-1, game_board, "all") or self.check_left(x, y-1, game_board, "all") or self.check_right(x, y-1, game_board, "all")
         elif direction == 1:
-            return self.check_right(x+1, y, game_board) or self.check_up(x+1, y, game_board) or self.check_down(x+1, y, game_board)
+            return self.check_right(x+1, y, game_board, "all") or self.check_up(x+1, y, game_board, "all") or self.check_down(x+1, y, game_board, "all")
         elif direction == 2:
-            return self.check_down(x, y+1, game_board) or self.check_left(x, y+1, game_board) or self.check_right(x, y+1, game_board)
+            return self.check_down(x, y+1, game_board, "all") or self.check_left(x, y+1, game_board, "all") or self.check_right(x, y+1, game_board, "all")
         else:
-            return self.check_left(x-1, y, game_board) or self.check_up(x-1, y, game_board) or self.check_down(x-1, y, game_board)
+            return self.check_left(x-1, y, game_board, "all") or self.check_up(x-1, y, game_board, "all") or self.check_down(x-1, y, game_board, "all")
 
 
 
