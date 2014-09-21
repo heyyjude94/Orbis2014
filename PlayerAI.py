@@ -197,13 +197,13 @@ class PlayerAI():
 
     def peek(self, x, y, game_board, direction):
         if direction  == 0:
-            return self.check_up(x, y-1, game_board, "opponent")
+            return self.check_up(x, y-1, game_board, "opponent") and self.check_left(x, y-1, game_board, "opponent") and self.check_right(x, y-1, game_board, "opponent")
         elif direction == 1:
-            return self.check_right(x+1, y, game_board, "opponent")
+            return self.check_right(x+1, y, game_board, "opponent") and self.check_up(x+1, y, game_board, "opponent") and self.check_down(x+1, y, game_board, "opponent")
         elif direction == 2:
-            return self.check_down(x, y+1, game_board, "opponent")
+            return self.check_down(x, y+1, game_board, "opponent") and self.check_left(x, y+1, game_board, "opponent") and self.check_right(x, y+1, game_board, "opponent")
         else:
-            return self.check_left(x-1, y, game_board, "opponent")
+            return self.check_left(x-1, y, game_board, "opponent") and self.check_up(x-1, y, game_board, "opponent") and self.check_down(x-1, y, game_board, "opponent")
 
     def not_dead_end(self, x, y, game_board, direction):
         if direction  == 0:
