@@ -21,14 +21,19 @@ class PlayerAI():
             return PlayerActions.MOVE_RIGHT
         elif randMove == 2:
             return PlayerActions.MOVE_DOWN
-        else:
+        elif randMove == 0:
             return PlayerActions.MOVE_UP
+        else:
+            if player_lightcycle["hasPowerup"]:
+                return PlayerActions.ACTIVATE_POWERUP
+            else:
+                print "Nice Try!"
 
     def next_move(self, x, y, game_map, direction):
         #checks current direction
         if direction == 2:
             down = self.check_down(x, y, game_map, "all")
-            if down and self.not_dead_end(x, y, game_map, 2) and self.peek(x,y,game_map, 2):
+            if down and self.not_dead_end(x, y, game_map, 2) and self.peek(x, y, game_map, 2):
                 return 2
             else:
                 return self.find_next_step(x, y, game_map, 2)
@@ -61,6 +66,8 @@ class PlayerAI():
                     return 0
             elif not up and down:
                     return 2
+            elif not up and not down:
+                    return 5
             else:
                 if self.go_up(y, game_board):
                     return 0
@@ -72,6 +79,8 @@ class PlayerAI():
                     return 3
             elif not left and right:
                     return 1
+            elif not left and not right:
+                    return 5
             else:
                 if self.go_left(x, game_board):
                     return 3
