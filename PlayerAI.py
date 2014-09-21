@@ -28,12 +28,14 @@ class PlayerAI():
                 return PlayerActions.ACTIVATE_POWERUP
             else:
                 print "Nice Try!"
+                print randMove
+                return PlayerActions.MOVE_UP
 
     def next_move(self, x, y, game_map, direction):
         #checks current direction
         if direction == 2:
             down = self.check_down(x, y, game_map, "all")
-            if down and self.not_dead_end(x, y, game_map, 2) and self.peek(x, y, game_map, 2):
+            if down and self.not_dead_end(x, y, game_map, 2) and self.peek(x,y,game_map, 2):
                 return 2
             else:
                 return self.find_next_step(x, y, game_map, 2)
@@ -52,7 +54,7 @@ class PlayerAI():
         else:
             up = self.check_up(x, y, game_map, "all")
             if up and self.not_dead_end(x, y, game_map, 0) and self.peek(x,y,game_map, 0):
-                return
+                return 0
             else:
                 return self.find_next_step(x, y, game_map, 0)
 
@@ -69,11 +71,7 @@ class PlayerAI():
             elif not up and not down:
                     return 5
             else:
-                if self.go_up(y, game_board):
-                    return 0
-                else:
-                    return 2
-
+                return self.vision(x,y,game_board,direction)
         else:
             if not right and left:
                     return 3
@@ -82,10 +80,44 @@ class PlayerAI():
             elif not left and not right:
                     return 5
             else:
-                if self.go_left(x, game_board):
-                    return 3
+                return self.vision(x,y,game_board,direction)
+
+    def vision(self, x, y, game_board, direction):
+        count1 = 0
+        count2 = 0
+        breakFlag = 0
+        counter = 1
+        if direction == 1 or direction == 3: #Vertical
+            while breakFlag != 1:
+                if game_board[x][y+counter] == EMPTY or game_board[x][y+counter] == POWERUP:
+                    count1 = count1 + 1
                 else:
-                    return 1
+                    breakFlag = 1
+                if game_board[x][y-counter] == EMPTY or game_board[x][y-counter] == POWERUP:
+                    count2 = count2 + 1
+                else:
+                    breakFlag = 1
+                counter += 1
+
+            if count1 > count2:
+                return 2
+            else:
+                return 0
+        else: #Horizontal
+            while breakFlag != 1:
+                if game_board[x+counter][y] == EMPTY or game_board[x+counter][y] == POWERUP:
+                    count1 = count1 + 1
+                else:
+                    breakFlag = 1
+                if game_board[x-counter][y] == EMPTY or game_board[x-counter][y] == POWERUP:
+                    count2 = count2 + 1
+                else:
+                    breakFlag = 1
+                counter += 1
+            if count1 > count2:
+                return 1
+            else:
+                return 3
 
 
 
@@ -187,17 +219,17 @@ class PlayerAI():
 
 '''
 
-8888888 8888888888 8 888888888o.      ,o888888o.     b.             8 
-      8 8888       8 8888    `88.  . 8888     `88.   888o.          8 
-      8 8888       8 8888     `88 ,8 8888       `8b  Y88888o.       8 
-      8 8888       8 8888     ,88 88 8888        `8b .`Y888888o.    8 
-      8 8888       8 8888.   ,88' 88 8888         88 8o. `Y888888o. 8 
-      8 8888       8 888888888P'  88 8888         88 8`Y8o. `Y88888o8 
-      8 8888       8 8888`8b      88 8888        ,8P 8   `Y8o. `Y8888 
-      8 8888       8 8888 `8b.    `8 8888       ,8P  8      `Y8o. `Y8 
-      8 8888       8 8888   `8b.   ` 8888     ,88'   8         `Y8o.` 
+8888888 8888888888 8 888888888o.      ,o888888o.     b.             8
+      8 8888       8 8888    `88.  . 8888     `88.   888o.          8
+      8 8888       8 8888     `88 ,8 8888       `8b  Y88888o.       8
+      8 8888       8 8888     ,88 88 8888        `8b .`Y888888o.    8
+      8 8888       8 8888.   ,88' 88 8888         88 8o. `Y888888o. 8
+      8 8888       8 888888888P'  88 8888         88 8`Y8o. `Y88888o8
+      8 8888       8 8888`8b      88 8888        ,8P 8   `Y8o. `Y8888
+      8 8888       8 8888 `8b.    `8 8888       ,8P  8      `Y8o. `Y8
+      8 8888       8 8888   `8b.   ` 8888     ,88'   8         `Y8o.`
       8 8888       8 8888     `88.    `8888888P'     8            `Yo
-      
+
                                 Quick Guide
                 --------------------------------------------
                       Feel free to delete this comment.
@@ -234,9 +266,9 @@ class PlayerAI():
                                                 PlayerAction.ACTIVATE_POWERUP_MOVE_DOWN
                                                 PlayerAction.ACTIVATE_POWERUP_MOVE_LEFT
                                                 PlayerAction.ACTIVATE_POWERUP_MOVE_RIGHT
-                
+
         9. If you have any questions, contact challenge@orbis.com
 
         10. Good luck! Submissions are due Sunday, September 21 at noon. You can submit multiple times and your most recent submission will be the one graded.
- 
+
 '''
